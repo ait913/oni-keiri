@@ -58,7 +58,7 @@ oni-keiri/
 │   │   │   ├── cardSchedule.ts # cycleRange / cardPaymentSchedule / cardUtilization (§4.3, 純関数)
 │   │   │   ├── materialize.ts  # ensureMaterializedForUser / rematerializeRule (§4.4)
 │   │   │   ├── homeSummary.ts  # buildHomeSummary / buildDailySeries / buildBreakdown / buildQuality (§4.2/4.6/4.7)
-│   │   │   ├── calendar.ts     # buildCalendarEvents (§4.7)
+│   │   │   ├── calendar.ts     # buildCalendarEvents / paymentCountOf / paymentTotalOf (§4.7)
 │   │   │   └── tax.ts          # TAX_BRACKETS / taxEstimate (§4.5, 純関数)
 │   │   └── routes/           # home.ts / entries.ts / cards.ts / recurringRules.ts / calendar.ts / tax.ts / settings.ts / me.ts
 │   ├── drizzle/              # migration SQL (drizzle-kit generate 出力)
@@ -272,6 +272,54 @@ savingTip(M)       = floor(qualityVariable(M) / 10)   // 「変動費を1割削�
 ```
 
 比率表示はクライアント: `fixedPct = round(fixed×100/(fixed+variable))`、`variablePct = 100 − fixedPct`。合計 0 なら両方 0 (バー非表示)。カテゴリ推定はしない (v1 の割り切り。削減ヒントも v1 スコープ外 §13-18)。
+
+**確定シグネチャと配線 (Developer/Reviewer の唯一の契約。集計関数は全て「射影済み入力を受ける薄い純関数」であり、DB にも `cardPaymentSchedule` にも触らない)**:
+
+```ts
+// ---- 共通入力行 (route 層が DB から取得し deletedAt IS NULL でフィルタ済み) ----
+export type EntryRow = {
+  id: string; kind: "expense" | "card_expense" | "income"; amount: number;
+  date: string; category: string | null; cardId: string | null;
+  incomeSource: "salary" | "other" | null; note: string | null; sourceRuleId: string | null;
+};
+// route 層が cardPaymentSchedule (§4.3) を各カード 1 回だけ実行し、対象月 M の行へ射影したもの (amount=0 の行も含めて渡す)
+export type CardPaymentRow = {
+  cardId: string; cardName: string; paymentDate: string; amount: number;
+  fromExclusive: string; toInclusive: string; closed: boolean;
+};
+
+// ---- §4.7 の 4 関数 ----
+export function buildCalendarEvents(input: {
+  month: string;
+  entries: EntryRow[];             // yearMonth=month の全 entry (手動含む — 関数内で sourceRuleId≠null のみ採用)
+  cardPayments: CardPaymentRow[];  // 対象月 M に paymentDate がある行 (関数内で amount>0 のみイベント化 = B-CAL-3)
+  cardNamesById: Record<string, string>;  // fixed_cost イベントの cardName 解決用 (archived 含む全カード)
+}): { events: CalendarEvent[]; paymentCount: number; paymentTotal: number };
+// events の順序: date asc → 同日は type 順 (fixed_cost → salary → card_payment) → 同 type 内は id (entryId/cardId) asc
+
+export function buildHomeSummary(input: {
+  entries: EntryRow[];             // yearMonth=M の全 entry
+  cardPayments: CardPaymentRow[];  // 対象月 M
+  savingsGoal: number | null;
+}): { income: number; cashExpense: number; cardPaymentDue: number; cardUsage: number;
+      spending: number; remaining: number; spendable: number };   // 全て §4.2 の定義
+
+export function buildBreakdown(entries: EntryRow[]): CategoryBreakdownItem[];
+// 入力 = yearMonth=M の全 entry。関数内で kind∈{expense,card_expense} を採用。null→other 合算、amount>0 のみ、
+// amount 降順 → 同額は ENTRY_CATEGORIES の宣言順
+
+export function buildQuality(entries: EntryRow[]): { fixed: number; variable: number; savingTip: number };
+// 入力 = yearMonth=M の全 entry。関数内で kind∈{expense,card_expense} を採用し sourceRuleId の有無で fixed/variable に分ける
+
+// ---- 合計規則の共有ヘルパ (buildCalendarEvents 内部と home の upcoming 集計が同じ実装を使う) ----
+export function paymentCountOf(events: CalendarEvent[]): number;  // type∈{fixed_cost, card_payment} の件数 (salary 除外)
+export function paymentTotalOf(events: CalendarEvent[]): number;  // Σ fixed_cost(cardId=null) + Σ card_payment (現金流出ベース)
+```
+
+route 層の配線 (この責務分担を実装が変えない):
+1. 対象月 M の entry (deletedAt=null) と全カードを取得し、**カードごとに `cardPaymentSchedule` を 1 回**実行 → 月 M の行を `CardPaymentRow[]` に射影
+2. 同じ `entries` / `cardPayments` を `buildHomeSummary` / `buildDailySeries` (§4.6。`CardPaymentRow` は構造的に §4.6 の `cardPayments` 入力を満たす) / `buildCalendarEvents` に配る — **カード計算は 1 route 1 回**
+3. home の `upcomingPayments` = `buildCalendarEvents(...).events` から `type∈{fixed_cost,card_payment} ∧ date>today` を抽出、`upcomingTotal` = その部分集合への `paymentTotalOf`
 
 ## 5. データモデル (Drizzle / Postgres。★本丸)
 
