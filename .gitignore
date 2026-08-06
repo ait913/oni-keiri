@@ -6,3 +6,5 @@ dist/
 *.log
 DerivedData/
 *.xcodeproj
+.ref-atender/
+apps/ios/OniKeiri.xcodeproj

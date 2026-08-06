@@ -1,0 +1,2 @@
+ONIKEIRI_API_SCHEME = http
+ONIKEIRI_API_HOST = localhost:8787
