@@ -47,6 +47,27 @@ curl -sS -H "Authorization: Bearer $COOLIFY_API_TOKEN" "$COOLIFY_API_BASE/deploy
 ```
 migration はコンテナ起動時に自走 (index.ts が drizzle migrate を実行)。
 
+### TestFlight に上げる (atender 手順の流用)
+
+```
+cd apps/ios; xcodegen generate
+xcodebuild archive -project OniKeiri.xcodeproj -scheme OniKeiri -configuration Release \
+  -destination 'generic/platform=iOS' -archivePath build/OniKeiri.xcarchive \
+  -allowProvisioningUpdates \
+  -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_973AZ487M3.p8 \
+  -authenticationKeyID 973AZ487M3 -authenticationKeyIssuerID a3955ee4-936a-4c78-b9d1-9d1c559885af
+xcodebuild -exportArchive -archivePath build/OniKeiri.xcarchive \
+  -exportOptionsPlist build/ExportOptions.plist -exportPath build/export \
+  -allowProvisioningUpdates (同上の鍵引数)
+xcrun altool --upload-app -f build/export/OniKeiri.ipa -t ios \
+  --apiKey 973AZ487M3 --apiIssuer a3955ee4-936a-4c78-b9d1-9d1c559885af
+```
+
+- 出力は pipe に通さずファイルに落とす (バッファでハング判別不能になる)
+- codesign 無言ハング時: `security set-key-partition-list -S apple-tool:,apple:,codesign: -s ~/Library/Keychains/login.keychain-db`
+- 版数の正典は project.yml の info.properties (Info.plist 手編集禁止)
+- **2026-08-07 時点: archive/export まで成功済 (App ID net.appily.onikeiri は自動登録済)。upload は ASC の app レコード作成待ち**
+
 ### iOS をビルドする
 
 ```
