@@ -1,0 +1,12 @@
+{
+  "name": "oni-keiri",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "pnpm -C apps/api dev",
+    "build": "pnpm -C apps/api build",
+    "typecheck": "pnpm -C apps/api typecheck",
+    "test": "pnpm -C apps/api test",
+    "db:generate": "pnpm -C apps/api db:generate"
+  }
+}
