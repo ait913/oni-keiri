@@ -1,0 +1,1336 @@
+<title>鬼個人経理 UI mock v0.6</title>
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #F5F6F5;
+    --ink: #121316;
+    --grad-ink: radial-gradient(circle at 82% 18%, rgba(255,255,255,.10), transparent 55%), linear-gradient(150deg, #17181C 0%, #26272C 100%);
+    --teal: #2E9E8F;
+    --teal-soft: #E7F3F0;
+    --red: #E60033;
+    --line: #EFEFF1;
+    --cell: #F4F4F5;
+    --text: #17181A;
+    --text-sub: #8E9097;
+    --cat-1: #E60033;
+    --cat-2: #FF9500;
+    --cat-3: #5856D6;
+    --cat-4: #34C759;
+    --cat-5: #00A8C6;
+    --cat-6: #8E8E93;
+    --chart-grid: #EEEEF0;
+    --r-hero: 24px;
+    --r-card: 18px;
+    --r-tile: 12px;
+    --font-display: 700 40px/1.05 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-amount-l: 700 24px/1.15 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-amount-m: 600 16px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-title: 700 18px/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-heading: 600 13px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-body: 400 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-body-strong: 600 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-caption: 500 12px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-label-s: 500 11px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --outer-bg: #EDEEEC;
+    --outer-caption: #6E7280;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --outer-bg: #1C1C1F; --outer-caption: #98989E; }
+  }
+  :root[data-theme="dark"] { --outer-bg: #1C1C1F; --outer-caption: #98989E; }
+  :root[data-theme="light"] { --outer-bg: #EDEEEC; --outer-caption: #6E7280; }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    background: var(--outer-bg);
+    color: var(--text);
+    font: var(--font-body);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  .mock-caption { color: var(--outer-caption); font: var(--font-caption); }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    flex: 0 0 auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 46px;
+    background: var(--bg);
+    box-shadow: 0 24px 70px rgba(18, 19, 22, .2), 0 0 0 1px rgba(18, 19, 22, .08);
+  }
+
+  .statusbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 44px;
+    padding: 14px 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font: var(--font-body-strong);
+    z-index: 20;
+    pointer-events: none;
+  }
+  .statusbar svg { height: 12px; display: block; }
+
+  .screen {
+    display: none;
+    height: calc(100% - 84px);
+    overflow-y: auto;
+    padding: 56px 16px 20px;
+    background: var(--bg);
+  }
+  .screen.active { display: block; }
+
+  h1, h2, h3, p { margin: 0; }
+  h1 { font: var(--font-title); }
+  .sub { color: var(--text-sub); font: var(--font-caption); }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .header-id { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 999px;
+    background: var(--red);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font: var(--font-body-strong);
+    flex: 0 0 auto;
+  }
+  .header-name { font: var(--font-body-strong); }
+  .icon-circle {
+    width: 38px; height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .icon-circle svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font: var(--font-body-strong);
+    padding: 0;
+    cursor: pointer;
+  }
+
+  /* ---- black hero ---- */
+  .hero {
+    border-radius: var(--r-hero);
+    background: var(--grad-ink);
+    color: #fff;
+    padding: 20px 20px 18px;
+    margin-bottom: 14px;
+  }
+  .hero-label { font: var(--font-caption); color: rgba(255,255,255,.62); }
+  .hero-amount { font: var(--font-display); margin-top: 6px; }
+  .hero-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 18px;
+  }
+  .hero-foot .k { font: var(--font-label-s); color: rgba(255,255,255,.55); display: block; margin-bottom: 3px; }
+  .hero-foot .v { font: var(--font-amount-m); color: #fff; }
+  .hero-foot .v.teal { color: #6FD3C5; }
+
+  /* ---- cards ---- */
+  .card {
+    border-radius: var(--r-card);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .card-head h2 { font: var(--font-heading); color: var(--text-sub); letter-spacing: .02em; }
+  .amount-l { font: var(--font-amount-l); }
+  .amount-m { font: var(--font-amount-m); }
+  .pos { color: var(--teal); }
+  .neg { color: var(--red); }
+
+  /* ---- quick actions ---- */
+  .quick-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 0 0 14px;
+  }
+  .quick {
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    background: var(--bg);
+    font: inherit;
+    color: var(--text);
+    padding: 12px 0 10px;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .quick svg { width: 21px; height: 21px; stroke: currentColor; stroke-width: 2.1; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .quick span { font: var(--font-label-s); color: var(--text-sub); }
+
+  /* ---- feature grid ---- */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .feature {
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: var(--text);
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .feature-icon {
+    width: 52px; height: 52px;
+    border-radius: var(--r-card);
+    background: var(--bg-soft);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+  }
+  .feature-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .feature span:last-child { font: var(--font-label-s); color: var(--text-sub); }
+
+  /* ---- rows ---- */
+  .row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .row:last-of-type, .row.no-line { border-bottom: 0; }
+  .row-static { cursor: default; }
+  .row-date { width: 34px; font: var(--font-caption); color: var(--text-sub); flex: 0 0 auto; }
+  .row-main { flex: 1; min-width: 0; }
+  .row-title { font: var(--font-body-strong); }
+  .row-sub { font: var(--font-caption); color: var(--text-sub); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-side { text-align: right; font: var(--font-amount-m); }
+  .row-side .row-sub { margin-top: 3px; }
+  .chev { color: var(--text-sub); flex: 0 0 auto; }
+  .row-icon {
+    width: 36px; height: 36px;
+    border-radius: var(--r-tile);
+    background: var(--bg-soft);
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+  }
+  .row-icon svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---- service letter tiles ---- */
+  .stile {
+    width: 36px; height: 36px;
+    border-radius: var(--r-tile);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font: var(--font-body-strong);
+    flex: 0 0 auto;
+  }
+  .stile.sm { width: 24px; height: 24px; border-radius: 8px; font: var(--font-label-s); font-weight: 700; }
+  .st-netflix { background: #D81F26; }
+  .st-adobe { background: #EB1000; }
+  .st-prime { background: #FF9900; }
+  .st-icloud { background: #7D7F85; }
+  .st-rakuten { background: #BF0000; }
+  .st-smcc { background: #12653F; }
+  .st-rent { background: #5856D6; }
+  .st-salary { background: var(--teal); }
+  .st-spotify { background: #1DB954; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--bg-soft);
+    color: var(--text-sub);
+    font: var(--font-label-s);
+    margin-top: 3px;
+  }
+
+  /* ---- pills ---- */
+  .pill-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; scrollbar-width: none; }
+  .pill-row::-webkit-scrollbar { display: none; }
+  .pill {
+    border: 0;
+    border-radius: 999px;
+    padding: 9px 15px;
+    background: var(--bg-soft);
+    color: var(--text-sub);
+    font: var(--font-caption);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .pill.active { background: var(--ink); color: #fff; }
+
+  .ghost-btn {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text);
+    font: var(--font-body-strong);
+    padding: 12px 0;
+    margin: 4px 0 12px;
+    cursor: pointer;
+  }
+  .primary-btn {
+    width: 100%;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    font: var(--font-body-strong);
+    font-size: 16px;
+    padding: 15px 0;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+  .fab {
+    position: sticky;
+    bottom: 8px;
+    margin-left: auto;
+    display: grid;
+    place-items: center;
+    width: 54px; height: 54px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 26px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(18,19,22,.28);
+  }
+
+  .link-btn {
+    border: 0;
+    background: transparent;
+    color: var(--teal);
+    font: var(--font-caption);
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  /* ---- chart ---- */
+  .balance-chart { width: 100%; height: 128px; display: block; margin-top: 2px; }
+  .axis-label { fill: var(--text-sub); font: var(--font-label-s); }
+  .target-label { fill: var(--teal); font: var(--font-label-s); }
+  .chart-status { display: grid; gap: 6px; margin-top: 10px; }
+  .status-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font: var(--font-caption);
+    color: var(--text-sub);
+  }
+  .status-left { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 7px; height: 7px; border-radius: 999px; flex: 0 0 auto; }
+  .dot.teal { background: var(--teal); }
+  .status-line .amount-m { color: var(--text); }
+
+  /* ---- calendar ---- */
+  .cal-head {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font: var(--font-label-s);
+    color: var(--text-sub);
+    margin-bottom: 4px;
+  }
+  .cal-head .sun { color: var(--red); }
+  .cal-head .sat { color: #3478F6; }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+  .cal-cell {
+    min-height: 52px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 3px 4px;
+    display: grid;
+    grid-template-rows: 14px 1fr;
+    justify-items: center;
+  }
+  .cal-cell .d { font: var(--font-label-s); color: var(--text); justify-self: start; }
+  .cal-cell.empty { background: var(--cell); }
+  .cal-cell.today .d {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 999px;
+    width: 17px; height: 17px;
+    display: grid;
+    place-items: center;
+    justify-self: start;
+  }
+
+  /* ---- breakdown / ranking ---- */
+  .breakdown { display: grid; grid-template-columns: 104px 1fr; gap: 14px; align-items: center; }
+  .donut { display: block; }
+  .rank { display: grid; gap: 9px; }
+  .rank-row { display: grid; gap: 4px; }
+  .rank-top { display: flex; align-items: center; gap: 7px; font: var(--font-caption); }
+  .rank-top .name { color: var(--text); font-weight: 600; flex: 1; }
+  .rank-track { height: 4px; border-radius: 999px; background: var(--bg-soft); overflow: hidden; }
+  .rank-fill { height: 100%; border-radius: inherit; }
+
+  .stack-bar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; margin: 4px 0 10px; }
+  .stack-fixed { background: var(--ink); }
+  .stack-variable { background: var(--teal); }
+  .legend { display: flex; justify-content: space-between; font: var(--font-caption); color: var(--text-sub); }
+  .legend b { color: var(--text); font-weight: 600; }
+  .insight {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .insight .row-icon { background: var(--teal-soft); color: var(--teal); }
+  .insight-main { flex: 1; font: var(--font-caption); color: var(--text-sub); }
+  .insight-val { font: var(--font-amount-m); color: var(--teal); }
+
+  .day-heading { font: var(--font-caption); color: var(--text-sub); margin: 14px 4px 6px; }
+  .list-card { padding: 4px 16px; }
+
+  /* ---- credit card visual ---- */
+  .cc {
+    border-radius: 18px;
+    background: var(--grad-ink);
+    color: #fff;
+    padding: 18px 18px 16px;
+    aspect-ratio: 1.62;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cc-name { font: var(--font-body-strong); font-size: 16px; }
+  .cc-meta { font: var(--font-caption); color: rgba(255,255,255,.6); margin-top: 4px; }
+  .cc-bottom { font: var(--font-caption); color: rgba(255,255,255,.85); }
+  .cc-track { height: 4px; border-radius: 999px; background: rgba(255,255,255,.22); margin-top: 8px; overflow: hidden; }
+  .cc-fill { height: 100%; width: 17.4%; background: #fff; border-radius: inherit; }
+  .cc-mini {
+    width: 42px; height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #17181C 0%, #34353B 100%);
+    flex: 0 0 auto;
+  }
+
+  .toggle {
+    width: 46px; height: 28px;
+    border-radius: 999px;
+    background: #D9DCE3;
+    position: relative;
+    flex: 0 0 auto;
+    cursor: pointer;
+    border: 0;
+  }
+  .toggle.on { background: var(--teal); }
+  .toggle::after {
+    content: "";
+    position: absolute;
+    width: 24px; height: 24px;
+    top: 2px; left: 2px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(18,19,22,.2);
+    transition: left .15s ease;
+  }
+  .toggle.on::after { left: 20px; }
+
+  /* ---- tab bar ---- */
+  .tabbar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 84px;
+    padding: 10px 40px 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: rgba(255,255,255,.94);
+    border-top: 1px solid var(--line);
+    backdrop-filter: blur(18px);
+    z-index: 10;
+  }
+  .tab {
+    border: 0;
+    background: transparent;
+    color: var(--text-sub);
+    font: inherit;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .tab span { font: var(--font-label-s); }
+  .tab svg { width: 23px; height: 23px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .tab.active { color: var(--text); }
+  .tab.active svg { stroke-width: 2.5; }
+
+  /* ---- modal ---- */
+  .scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: none;
+    align-items: flex-end;
+    background: rgba(18,19,22,.32);
+  }
+  .scrim.open { display: flex; }
+  .sheet {
+    width: 100%;
+    border-radius: 28px 28px 0 0;
+    background: var(--bg);
+    padding: 12px 16px 26px;
+    animation: up .18s ease-out;
+  }
+  @keyframes up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .sheet { animation: none; } }
+  .grabber { width: 40px; height: 5px; border-radius: 999px; background: #D9DBE0; margin: 0 auto 14px; }
+  .segments { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
+  .segment {
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 0;
+    background: var(--bg-soft);
+    color: var(--text-sub);
+    font: var(--font-caption);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .segment.active { background: var(--ink); color: #fff; }
+  .sheet-amount {
+    text-align: center;
+    font: var(--font-display);
+    font-size: 38px;
+    padding: 10px 0 16px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 6px;
+  }
+  .sheet-label { font: var(--font-heading); color: var(--text-sub); letter-spacing: .02em; margin: 10px 2px 7px; }
+  .chip {
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: var(--bg-soft);
+    color: var(--text);
+    font: var(--font-caption);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .chip.active { background: var(--ink); color: #fff; }
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+  .key {
+    height: 52px;
+    border: 0;
+    border-radius: var(--r-tile);
+    background: transparent;
+    color: var(--text);
+    font: var(--font-amount-m);
+    font-size: 21px;
+    cursor: pointer;
+  }
+  .key:active { background: var(--bg-soft); }
+</style>
+
+<div class="mock-caption">鬼個人経理 UI mock v0.6</div>
+<main class="phone" aria-label="鬼個人経理 iPhone UI mock">
+  <div class="statusbar">
+    <span>10:40</span>
+    <svg viewBox="0 0 54 12" width="54"><g fill="#17181A"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="1" width="3" height="11" rx="1"/><path d="M25 6.5a6.5 6.5 0 0 1 9 0l-1.4 1.5a4.5 4.5 0 0 0-6.2 0Zm2.6 2.8a3 3 0 0 1 3.8 0L29.5 11Z"/><rect x="38" y="2.5" width="13" height="7" rx="2.4" fill="none" stroke="#17181A"/><rect x="39.5" y="4" width="8" height="4" rx="1.2"/><rect x="52" y="4.5" width="2" height="3" rx="1"/></g></svg>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen active" data-screen="home">
+    <div class="header-row">
+      <div class="header-id">
+        <div class="avatar">鬼</div>
+        <div>
+          <div class="header-name">2026年8月</div>
+          <div class="sub">あと25日</div>
+        </div>
+      </div>
+      <button class="icon-circle" type="button" aria-label="通知">
+        <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </button>
+    </div>
+
+    <div class="hero">
+      <div class="hero-label">今月あと使える額</div>
+      <div class="hero-amount">¥123,456</div>
+      <div class="hero-foot">
+        <div><span class="k">収入 − 支出・予定込み</span><span class="v">¥280,000 − ¥156,544</span></div>
+        <div style="text-align:right"><span class="k">貯金見込み</span><span class="v teal">¥285,000</span></div>
+      </div>
+    </div>
+
+    <div class="quick-row" aria-label="記録する">
+      <button class="quick js-input" type="button" data-type="支出">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg>
+        <span>支出</span>
+      </button>
+      <button class="quick js-input" type="button" data-type="収入">
+        <svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>
+        <span>収入</span>
+      </button>
+      <button class="quick js-input" type="button" data-type="クレカ支出">
+        <svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19"/></svg>
+        <span>クレカ支出</span>
+      </button>
+    </div>
+
+    <div class="feature-grid" aria-label="管理する">
+      <button class="feature js-push" type="button" data-to="subs">
+        <span class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v5h-5"/></svg></span>
+        <span>サブスク・定額</span>
+      </button>
+      <button class="feature js-push" type="button" data-to="cards">
+        <span class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19"/><path d="M6.5 15h4"/></svg></span>
+        <span>カード</span>
+      </button>
+      <button class="feature js-push" type="button" data-to="salary">
+        <span class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M12 11v5"/><path d="M9.5 13.5h5"/></svg></span>
+        <span>給与</span>
+      </button>
+      <button class="feature js-push" type="button" data-to="tax">
+        <span class="feature-icon"><svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M7 16V9"/><path d="M12 16V4"/><path d="M17 16v-6"/></svg></span>
+        <span>税金目安</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>今後の支払い</h2>
+        <button class="link-btn js-push" type="button" data-to="calendar">カレンダーで見る ›</button>
+      </div>
+      <div class="row row-static">
+        <span class="row-date">8/15</span>
+        <span class="stile st-netflix">N</span>
+        <span class="row-main"><span class="row-title">Netflix</span><span class="row-sub">楽天カードから</span></span>
+        <span class="row-side">¥1,490</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-date">8/21</span>
+        <span class="stile st-adobe">A</span>
+        <span class="row-main"><span class="row-title">Adobe</span><span class="row-sub">楽天カードから</span></span>
+        <span class="row-side">¥6,480</span>
+      </div>
+      <div class="row js-card-detail">
+        <span class="row-date">8/27</span>
+        <span class="cc-mini"></span>
+        <span class="row-main"><span class="row-title">楽天カード 引き落とし</span><span class="row-sub">7/16〜8/15 利用分</span></span>
+        <span class="row-side">¥52,300</span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row row-static no-line">
+        <span class="row-main"><span class="row-sub">8月の残り支払い予定 (3件)</span></span>
+        <span class="row-side">¥60,270</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>残高推移</h2>
+        <span class="sub">8月末まで</span>
+      </div>
+      <svg class="balance-chart" viewBox="0 0 330 132" preserveAspectRatio="none" role="img" aria-label="残高推移チャート">
+        <defs>
+          <linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(23,24,28,.14)"/>
+            <stop offset="1" stop-color="rgba(23,24,28,0)"/>
+          </linearGradient>
+        </defs>
+        <line x1="8" y1="30" x2="322" y2="30" stroke="var(--chart-grid)" stroke-width="1"/>
+        <line x1="8" y1="60" x2="322" y2="60" stroke="var(--chart-grid)" stroke-width="1"/>
+        <line x1="8" y1="90" x2="322" y2="90" stroke="var(--chart-grid)" stroke-width="1"/>
+        <line x1="8" y1="75" x2="322" y2="75" stroke="var(--teal)" stroke-width="1.2" stroke-dasharray="5 4" opacity=".7"/>
+        <text class="target-label" x="322" y="71" text-anchor="end">貯金目標 ¥100,000</text>
+        <path d="M8,85 L28,86 L49,55 L59,69 L59,100 L8,100 Z" fill="url(#gArea)"/>
+        <polyline points="8,85 28,86 49,55 59,69" fill="none" stroke="#17181C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="59,69 90,72 100,80 141,81 151,82 202,83 243,84 253,14 273,27 314,28" fill="none" stroke="#B9BCC4" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="59" y1="14" x2="59" y2="100" stroke="rgba(18,19,22,.12)" stroke-width="1"/>
+        <circle cx="59" cy="69" r="4.5" fill="#fff" stroke="#17181C" stroke-width="2.6"/>
+        <circle cx="243" cy="84" r="3.4" fill="#FF9500"/>
+        <text class="axis-label" x="8" y="122">8/1</text>
+        <text class="axis-label" x="100" y="122" text-anchor="middle">8/10</text>
+        <text class="axis-label" x="202" y="122" text-anchor="middle">8/20</text>
+        <text class="axis-label" x="322" y="122" text-anchor="end">8/31</text>
+      </svg>
+      <div class="chart-status">
+        <div class="status-line">
+          <span class="status-left"><span class="dot" style="background:#FF9500"></span>最低残高 8/24 — 支払いはすべて足りる見込み</span>
+          <span class="amount-m">¥64,300</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CALENDAR ============ -->
+  <section class="screen" data-screen="calendar">
+    <div class="header-row">
+      <button class="back-btn js-back" type="button">‹ 戻る</button>
+      <h1>2026年8月</h1>
+      <span style="width:44px"></span>
+    </div>
+
+    <div class="cal-head">
+      <span class="sun">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="sat">土</span>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell"><span class="d">1</span><span class="stile sm st-rent">家</span></div>
+      <div class="cal-cell"><span class="d">2</span></div>
+      <div class="cal-cell"><span class="d">3</span></div>
+      <div class="cal-cell"><span class="d">4</span></div>
+      <div class="cal-cell"><span class="d">5</span></div>
+      <div class="cal-cell today"><span class="d">6</span></div>
+      <div class="cal-cell"><span class="d">7</span></div>
+      <div class="cal-cell"><span class="d">8</span></div>
+      <div class="cal-cell"><span class="d">9</span></div>
+      <div class="cal-cell"><span class="d">10</span><span class="stile sm st-smcc">三</span></div>
+      <div class="cal-cell"><span class="d">11</span></div>
+      <div class="cal-cell"><span class="d">12</span></div>
+      <div class="cal-cell"><span class="d">13</span></div>
+      <div class="cal-cell"><span class="d">14</span></div>
+      <div class="cal-cell"><span class="d">15</span><span class="stile sm st-netflix">N</span></div>
+      <div class="cal-cell"><span class="d">16</span></div>
+      <div class="cal-cell"><span class="d">17</span></div>
+      <div class="cal-cell"><span class="d">18</span><span class="stile sm st-spotify">S</span></div>
+      <div class="cal-cell"><span class="d">19</span></div>
+      <div class="cal-cell"><span class="d">20</span></div>
+      <div class="cal-cell"><span class="d">21</span><span class="stile sm st-adobe">A</span></div>
+      <div class="cal-cell"><span class="d">22</span></div>
+      <div class="cal-cell"><span class="d">23</span></div>
+      <div class="cal-cell"><span class="d">24</span></div>
+      <div class="cal-cell"><span class="d">25</span><span class="stile sm st-salary">給</span></div>
+      <div class="cal-cell"><span class="d">26</span></div>
+      <div class="cal-cell"><span class="d">27</span><span class="stile sm st-rakuten">楽</span></div>
+      <div class="cal-cell"><span class="d">28</span></div>
+      <div class="cal-cell"><span class="d">29</span></div>
+      <div class="cal-cell"><span class="d">30</span></div>
+      <div class="cal-cell"><span class="d">31</span></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+      <div class="cal-cell empty"></div>
+    </div>
+
+    <div class="day-heading">8月の支払い予定 (6件)</div>
+    <div class="card list-card">
+      <div class="row row-static">
+        <span class="row-main"><span class="row-title">8月の合計</span></span>
+        <span class="row-side">¥176,570</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-date">8/1</span>
+        <span class="stile st-rent">家</span>
+        <span class="row-main"><span class="row-title">家賃</span><span class="row-sub">現金/口座</span></span>
+        <span class="row-side">¥82,000</span>
+      </div>
+      <div class="row js-card-detail">
+        <span class="row-date">8/10</span>
+        <span class="cc-mini"></span>
+        <span class="row-main"><span class="row-title">三井住友 引き落とし</span></span>
+        <span class="row-side">¥31,900</span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-date">8/15</span>
+        <span class="stile st-netflix">N</span>
+        <span class="row-main"><span class="row-title">Netflix</span><span class="row-sub">楽天カードから</span></span>
+        <span class="row-side">¥1,490</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-date">8/18</span>
+        <span class="stile st-spotify">S</span>
+        <span class="row-main"><span class="row-title">Spotify</span><span class="row-sub">楽天カードから</span></span>
+        <span class="row-side">¥980</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-date">8/21</span>
+        <span class="stile st-adobe">A</span>
+        <span class="row-main"><span class="row-title">Adobe</span><span class="row-sub">楽天カードから</span></span>
+        <span class="row-side">¥6,480</span>
+      </div>
+      <div class="row js-card-detail">
+        <span class="row-date">8/27</span>
+        <span class="cc-mini"></span>
+        <span class="row-main"><span class="row-title">楽天カード 引き落とし</span></span>
+        <span class="row-side">¥52,300</span>
+        <span class="chev">›</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUBS ============ -->
+  <section class="screen" data-screen="subs">
+    <div class="header-row">
+      <button class="back-btn js-back" type="button">‹ 戻る</button>
+      <h1>サブスク・定額</h1>
+      <span style="width:44px"></span>
+    </div>
+
+    <div class="hero" style="padding-bottom:16px">
+      <div class="hero-label">今月の定額支払い</div>
+      <div class="hero-amount" style="font-size:34px">¥97,430</div>
+      <div class="hero-foot">
+        <div><span class="k">年間換算</span><span class="v">¥1,169,160</span></div>
+        <div style="text-align:right"><span class="k">登録数</span><span class="v">6件</span></div>
+      </div>
+    </div>
+
+    <div class="pill-row">
+      <button class="pill active" type="button">請求日</button>
+      <button class="pill" type="button">高い順</button>
+      <button class="pill" type="button">安い順</button>
+      <button class="pill" type="button">カード別</button>
+    </div>
+
+    <div class="day-heading">登録中の定額支出</div>
+    <div class="card list-card">
+      <div class="row">
+        <span class="stile st-rent">家</span>
+        <span class="row-main"><span class="row-title">家賃</span><span class="row-sub">毎月1日・現金/口座</span></span>
+        <span class="row-side">¥82,000<span class="row-sub">/月</span></span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row">
+        <span class="stile st-netflix">N</span>
+        <span class="row-main"><span class="row-title">Netflix</span><span class="row-sub">毎月15日・楽天カード</span></span>
+        <span class="row-side">¥1,490<span class="row-sub">/月</span></span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row">
+        <span class="stile st-spotify">S</span>
+        <span class="row-main"><span class="row-title">Spotify</span><span class="row-sub">毎月18日・楽天カード</span></span>
+        <span class="row-side">¥980<span class="row-sub">/月</span></span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row">
+        <span class="stile st-adobe">A</span>
+        <span class="row-main"><span class="row-title">Adobe</span><span class="row-sub">毎月21日・楽天カード</span></span>
+        <span class="row-side">¥6,480<span class="row-sub">/月</span></span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row">
+        <span class="stile st-icloud"></span>
+        <span class="row-main"><span class="row-title">iCloud+</span><span class="row-sub">毎月2日・三井住友</span></span>
+        <span class="row-side">¥400<span class="row-sub">/月</span></span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row">
+        <span class="stile st-prime">P</span>
+        <span class="row-main"><span class="row-title">Amazon Prime</span><span class="row-sub">毎月6日・三井住友</span></span>
+        <span class="row-side">¥600<span class="row-sub">/月</span></span>
+        <span class="chev">›</span>
+      </div>
+    </div>
+    <button class="fab" type="button" aria-label="定額支出を追加">＋</button>
+  </section>
+
+  <!-- ============ CARDS LIST ============ -->
+  <section class="screen" data-screen="cards">
+    <div class="header-row">
+      <button class="back-btn js-back" type="button">‹ 戻る</button>
+      <h1>カード</h1>
+      <span style="width:44px"></span>
+    </div>
+
+    <div class="card list-card">
+      <div class="row js-card-detail">
+        <span class="cc-mini"></span>
+        <span class="row-main"><span class="row-title">楽天カード</span><span class="row-sub">締め 15日 / 支払い 27日</span></span>
+        <span class="row-side">¥52,300<span class="row-sub">今月利用</span></span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row js-card-detail">
+        <span class="cc-mini"></span>
+        <span class="row-main"><span class="row-title">三井住友</span><span class="row-sub">締め 月末 / 支払い 10日</span></span>
+        <span class="row-side">¥31,900<span class="row-sub">今月利用</span></span>
+        <span class="chev">›</span>
+      </div>
+    </div>
+    <button class="ghost-btn" type="button">＋ カードを追加</button>
+  </section>
+
+  <!-- ============ CARD DETAIL ============ -->
+  <section class="screen" data-screen="card-detail">
+    <div class="header-row">
+      <button class="back-btn js-back" type="button">‹ 戻る</button>
+      <h1>楽天カード</h1>
+      <span style="width:44px"></span>
+    </div>
+
+    <div class="cc">
+      <div>
+        <div class="cc-name">楽天カード</div>
+        <div class="cc-meta">締め日 15日・支払日 27日・リボ OFF</div>
+      </div>
+      <div class="cc-bottom">
+        使用 ¥52,300 / 限度 ¥300,000
+        <div class="cc-track"><div class="cc-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>来月の支払い目安</h2>
+        <span class="amount-l">¥52,300</span>
+      </div>
+      <div class="status-line">
+        <span class="status-left"><span class="dot teal"></span>9/27 に支払い予定・残高で足りる見込み</span>
+      </div>
+    </div>
+
+    <div class="card list-card">
+      <div class="day-heading" style="margin:10px 0 2px">最近のクレカ支出</div>
+      <div class="row row-static">
+        <span class="row-icon" style="color:var(--cat-1)"><svg viewBox="0 0 24 24"><path d="M4 11h16"/><path d="M6 11l2 9h8l2-9"/></svg></span>
+        <span class="row-main"><span class="row-title">食費</span><span class="row-sub">スーパー</span></span>
+        <span class="row-side">¥4,300</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-icon" style="color:var(--cat-5)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M7 16h10"/><path d="M9 8h6"/></svg></span>
+        <span class="row-main"><span class="row-title">経費</span><span class="row-sub">クラウド利用料</span></span>
+        <span class="row-side">¥12,000</span>
+      </div>
+    </div>
+
+    <div class="card list-card">
+      <div class="day-heading" style="margin:10px 0 2px">紐づく定額支出 <span class="sub">自動でクレカ支出に計上</span></div>
+      <div class="row row-static">
+        <span class="stile st-netflix">N</span>
+        <span class="row-main"><span class="row-title">Netflix</span><span class="row-sub">毎月15日</span></span>
+        <span class="row-side">¥1,490</span>
+      </div>
+      <div class="row row-static">
+        <span class="stile st-adobe">A</span>
+        <span class="row-main"><span class="row-title">Adobe</span><span class="row-sub">毎月21日</span></span>
+        <span class="row-side">¥6,480</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SALARY ============ -->
+  <section class="screen" data-screen="salary">
+    <div class="header-row">
+      <button class="back-btn js-back" type="button">‹ 戻る</button>
+      <h1>給与</h1>
+      <span style="width:44px"></span>
+    </div>
+
+    <div class="card list-card">
+      <div class="row">
+        <span class="stile st-salary">給</span>
+        <span class="row-main"><span class="row-title">給与 (本業)</span><span class="row-sub">毎月25日・自動計上</span></span>
+        <span class="row-side">¥280,000</span>
+        <span class="chev">›</span>
+      </div>
+    </div>
+    <button class="ghost-btn" type="button">＋ 給与を追加</button>
+    <p class="sub" style="margin:4px 4px 0">臨時収入・不定期の入金はホームの「収入」から都度追加できます。個人事業主モードでは給与入力時に経費も同時に登録できます。</p>
+  </section>
+
+  <!-- ============ TAX ============ -->
+  <section class="screen" data-screen="tax">
+    <div class="header-row">
+      <button class="back-btn js-back" type="button">‹ 戻る</button>
+      <h1>税金の取り置き</h1>
+      <span style="width:44px"></span>
+    </div>
+
+    <div class="hero" style="padding-bottom:16px">
+      <div class="hero-label">毎月 取っておく目安</div>
+      <div class="hero-amount" style="font-size:34px">¥81,900</div>
+      <div class="hero-foot">
+        <div><span class="k">年間目安</span><span class="v">¥982,800</span></div>
+        <div style="text-align:right"><span class="k">概算率</span><span class="v">27%</span></div>
+      </div>
+    </div>
+
+    <div class="card list-card">
+      <div class="day-heading" style="margin:10px 0 2px">今年の見込み (1月〜今日)</div>
+      <div class="row row-static">
+        <span class="row-main"><span class="row-title">事業収入</span></span>
+        <span class="row-side">¥4,820,000</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-main"><span class="row-title">経費</span></span>
+        <span class="row-side">¥1,180,000</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-main"><span class="row-title">利益 (課税所得ざっくり)</span></span>
+        <span class="row-side">¥3,640,000</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-main"><span class="row-title">税金の目安</span><span class="row-sub">所得税+住民税+国保</span></span>
+        <span class="row-side neg">約 ¥982,800</span>
+      </div>
+    </div>
+    <p class="sub" style="margin:8px 4px 0">概算率による目安です。実際の納付額は確定申告で決まります。</p>
+  </section>
+
+  <!-- ============ RECORDS ============ -->
+  <section class="screen" data-screen="records">
+    <div class="header-row" style="justify-content:center;gap:16px">
+      <button class="icon-circle" type="button" aria-label="前月">‹</button>
+      <h1>2026年8月</h1>
+      <button class="icon-circle" type="button" aria-label="翌月">›</button>
+    </div>
+    <div class="pill-row">
+      <button class="pill active" type="button">すべて</button>
+      <button class="pill" type="button">支出</button>
+      <button class="pill" type="button">収入</button>
+      <button class="pill" type="button">クレカ</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>今月の支出内訳</h2>
+        <span class="amount-l">¥162,520</span>
+      </div>
+      <div class="breakdown">
+        <svg class="donut" viewBox="0 0 100 100" width="104" height="104" role="img" aria-label="カテゴリ別支出の割合">
+          <g transform="rotate(-90 50 50)">
+            <circle cx="50" cy="50" r="40" stroke="#EEEEF0" stroke-width="11" fill="none"/>
+            <circle cx="50" cy="50" r="40" stroke="var(--cat-3)" stroke-width="11" fill="none" stroke-dasharray="124.9 126.4" stroke-dashoffset="0"/>
+            <circle cx="50" cy="50" r="40" stroke="var(--cat-1)" stroke-width="11" fill="none" stroke-dasharray="80.8 170.5" stroke-dashoffset="-126.9"/>
+            <circle cx="50" cy="50" r="40" stroke="var(--cat-5)" stroke-width="11" fill="none" stroke-dasharray="18.3 233" stroke-dashoffset="-209.7"/>
+            <circle cx="50" cy="50" r="40" stroke="var(--cat-2)" stroke-width="11" fill="none" stroke-dasharray="12.8 238.5" stroke-dashoffset="-230"/>
+            <circle cx="50" cy="50" r="40" stroke="var(--cat-4)" stroke-width="11" fill="none" stroke-dasharray="10.3 241" stroke-dashoffset="-244.8"/>
+          </g>
+        </svg>
+        <div class="rank">
+          <div class="rank-row">
+            <div class="rank-top"><span class="dot" style="background:var(--cat-3)"></span><span class="name">住居</span><span class="val">¥82,000</span></div>
+            <div class="rank-track"><div class="rank-fill" style="width:100%;background:var(--cat-3)"></div></div>
+          </div>
+          <div class="rank-row">
+            <div class="rank-top"><span class="dot" style="background:var(--cat-1)"></span><span class="name">食費</span><span class="val">¥53,200</span></div>
+            <div class="rank-track"><div class="rank-fill" style="width:65%;background:var(--cat-1)"></div></div>
+          </div>
+          <div class="rank-row">
+            <div class="rank-top"><span class="dot" style="background:var(--cat-5)"></span><span class="name">経費</span><span class="val">¥12,000</span></div>
+            <div class="rank-track"><div class="rank-fill" style="width:15%;background:var(--cat-5)"></div></div>
+          </div>
+          <div class="rank-row">
+            <div class="rank-top"><span class="dot" style="background:var(--cat-2)"></span><span class="name">交通</span><span class="val">¥8,420</span></div>
+            <div class="rank-track"><div class="rank-fill" style="width:10%;background:var(--cat-2)"></div></div>
+          </div>
+          <div class="rank-row">
+            <div class="rank-top"><span class="dot" style="background:var(--cat-4)"></span><span class="name">娯楽</span><span class="val">¥6,900</span></div>
+            <div class="rank-track"><div class="rank-fill" style="width:8%;background:var(--cat-4)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>支出の質</h2></div>
+      <div class="stack-bar">
+        <div class="stack-fixed" style="width:63%"></div>
+        <div class="stack-variable" style="width:37%"></div>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--ink);display:inline-block;margin-right:5px"></span>削減しづらい固定費 <b>63%</b></span>
+        <span><span class="dot teal" style="display:inline-block;margin-right:5px"></span>削減できる変動費 <b>37%</b></span>
+      </div>
+      <div class="insight">
+        <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 3Z"/></svg></span>
+        <span class="insight-main">変動費を1割削ると</span>
+        <span class="insight-val">+¥5,800/月</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>削減ヒント</h2>
+        <span class="sub">自動推定 (モック)</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-icon" style="background:var(--teal-soft);color:var(--teal)"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/></svg></span>
+        <span class="row-main"><span class="row-title">使っていないサブスク</span><span class="row-sub">動画配信 2件・最終利用 30日以上前</span></span>
+        <span class="row-side pos">+¥2,480<span class="row-sub">/月</span></span>
+      </div>
+      <div class="row row-static">
+        <span class="row-icon" style="background:var(--teal-soft);color:var(--teal)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>
+        <span class="row-main"><span class="row-title">食費が先月比 +12%</span><span class="row-sub">外食が増えています</span></span>
+        <span class="row-side pos">+¥6,200<span class="row-sub">想定</span></span>
+      </div>
+    </div>
+
+    <div class="day-heading">8月6日 木</div>
+    <div class="card list-card">
+      <div class="row row-static">
+        <span class="row-icon" style="color:var(--cat-1)"><svg viewBox="0 0 24 24"><path d="M4 11h16"/><path d="M6 11l2 9h8l2-9"/><path d="M9 11V7a3 3 0 0 1 6 0v4"/></svg></span>
+        <span class="row-main"><span class="row-title">食費</span><span class="row-sub">ランチ</span></span>
+        <span class="row-side">¥1,180</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-icon" style="color:var(--cat-6)"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/></svg></span>
+        <span class="row-main"><span class="row-title">家電アクセサリ</span><span class="badge">楽天カード</span></span>
+        <span class="row-side">¥8,900</span>
+      </div>
+    </div>
+
+    <div class="day-heading">8月5日 水</div>
+    <div class="card list-card">
+      <div class="row row-static">
+        <span class="row-icon" style="background:var(--teal-soft);color:var(--teal)"><svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg></span>
+        <span class="row-main"><span class="row-title">収入</span><span class="row-sub">業務委託 入金</span></span>
+        <span class="row-side pos">+¥120,000</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-icon" style="color:var(--cat-2)"><svg viewBox="0 0 24 24"><path d="M7 17h10"/><path d="M8 17V8a4 4 0 0 1 8 0v9"/><path d="M6 21h12"/></svg></span>
+        <span class="row-main"><span class="row-title">交通</span><span class="row-sub">電車</span></span>
+        <span class="row-side">¥420</span>
+      </div>
+    </div>
+
+    <div class="day-heading">8月1日 土</div>
+    <div class="card list-card">
+      <div class="row row-static">
+        <span class="stile st-rent">家</span>
+        <span class="row-main"><span class="row-title">住居</span><span class="row-sub">家賃 (定額)</span></span>
+        <span class="row-side">¥82,000</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-icon" style="color:var(--cat-4)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3Z"/></svg></span>
+        <span class="row-main"><span class="row-title">娯楽</span><span class="row-sub">映画</span><span class="badge">三井住友</span></span>
+        <span class="row-side">¥2,000</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="screen" data-screen="settings">
+    <div class="header-row">
+      <h1>設定</h1>
+    </div>
+
+    <div class="card list-card">
+      <div class="row row-static">
+        <span class="avatar">鬼</span>
+        <span class="row-main"><span class="row-title">Touri</span><span class="row-sub">Apple ID でログイン中</span></span>
+      </div>
+    </div>
+
+    <div class="day-heading">働き方</div>
+    <div class="card list-card">
+      <div class="row">
+        <span class="row-main"><span class="row-title">働き方</span><span class="row-sub">収入の扱いと税金目安に影響します</span></span>
+        <span class="row-side"><span class="amount-m" style="font-size:14px">個人事業主</span></span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row row-static">
+        <span class="row-main"><span class="row-title">経費入力・税金目安</span><span class="row-sub">個人事業主モードで有効</span></span>
+        <button class="toggle on" type="button" aria-label="経費入力と税金目安 ON"></button>
+      </div>
+    </div>
+
+    <div class="day-heading">目標</div>
+    <div class="card list-card">
+      <div class="row">
+        <span class="row-main"><span class="row-title">貯金目標</span><span class="row-sub">毎月の目標額</span></span>
+        <span class="row-side">¥100,000</span>
+        <span class="chev">›</span>
+      </div>
+    </div>
+
+    <p class="sub" style="text-align:center;margin-top:20px">ログアウト</p>
+  </section>
+
+  <!-- ============ TAB BAR ============ -->
+  <nav class="tabbar" aria-label="メインタブ">
+    <button class="tab active" type="button" data-tab="home">
+      <svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+      <span>ホーム</span>
+    </button>
+    <button class="tab" type="button" data-tab="records">
+      <svg viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+      <span>記録</span>
+    </button>
+    <button class="tab" type="button" data-tab="settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+      <span>設定</span>
+    </button>
+  </nav>
+
+  <!-- ============ INPUT MODAL ============ -->
+  <div id="input-modal" class="scrim" role="dialog" aria-modal="true" aria-label="記録を追加">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <div class="segments">
+        <button class="segment active" type="button" data-mode="支出">支出</button>
+        <button class="segment" type="button" data-mode="収入">収入</button>
+        <button class="segment" type="button" data-mode="クレカ支出">クレカ支出</button>
+      </div>
+      <div id="sheet-amount" class="sheet-amount">¥0</div>
+
+      <div class="sheet-label">カテゴリ</div>
+      <div class="pill-row">
+        <button class="chip active" type="button">食費</button>
+        <button class="chip" type="button">日用品</button>
+        <button class="chip" type="button">交通</button>
+        <button class="chip" type="button">娯楽</button>
+        <button class="chip" type="button">経費</button>
+        <button class="chip" type="button">医療</button>
+        <button class="chip" type="button">その他</button>
+      </div>
+
+      <div id="card-select">
+        <div class="sheet-label">カード</div>
+        <div class="pill-row">
+          <button class="chip active" type="button">楽天カード</button>
+          <button class="chip" type="button">三井住友</button>
+        </div>
+      </div>
+
+      <div class="keypad">
+        <button class="key" type="button" data-key="1">1</button>
+        <button class="key" type="button" data-key="2">2</button>
+        <button class="key" type="button" data-key="3">3</button>
+        <button class="key" type="button" data-key="4">4</button>
+        <button class="key" type="button" data-key="5">5</button>
+        <button class="key" type="button" data-key="6">6</button>
+        <button class="key" type="button" data-key="7">7</button>
+        <button class="key" type="button" data-key="8">8</button>
+        <button class="key" type="button" data-key="9">9</button>
+        <button class="key" type="button" data-key="00">00</button>
+        <button class="key" type="button" data-key="0">0</button>
+        <button class="key" type="button" data-key="del">⌫</button>
+      </div>
+      <button class="primary-btn js-close" type="button">追加する</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  const screens = document.querySelectorAll('.screen');
+  const tabs = document.querySelectorAll('.tab');
+  const modal = document.getElementById('input-modal');
+  const amountEl = document.getElementById('sheet-amount');
+  const cardSelect = document.getElementById('card-select');
+  const TAB_SCREENS = ['home', 'records', 'settings'];
+  let currentTab = 'home';
+  let activeScreen = 'home';
+  const stack = [];
+  let amount = '';
+
+  function yen(v) { return '¥' + Number(v || 0).toLocaleString('ja-JP'); }
+
+  function setScreen(name) {
+    activeScreen = name;
+    screens.forEach(s => s.classList.toggle('active', s.dataset.screen === name));
+    if (TAB_SCREENS.includes(name)) { currentTab = name; stack.length = 0; }
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === currentTab));
+  }
+  function push(name) { stack.push(activeScreen); setScreen(name); }
+  function back() { setScreen(stack.pop() || currentTab); }
+
+  tabs.forEach(t => t.addEventListener('click', () => setScreen(t.dataset.tab)));
+  document.querySelectorAll('.js-push').forEach(b =>
+    b.addEventListener('click', () => push(b.dataset.to)));
+  document.querySelectorAll('.js-card-detail').forEach(b =>
+    b.addEventListener('click', () => push('card-detail')));
+  document.querySelectorAll('.js-back').forEach(b =>
+    b.addEventListener('click', back));
+
+  function setMode(mode) {
+    document.querySelectorAll('.segment').forEach(s =>
+      s.classList.toggle('active', s.dataset.mode === mode));
+    cardSelect.style.display = mode === 'クレカ支出' ? 'block' : 'none';
+  }
+  document.querySelectorAll('.js-input').forEach(b =>
+    b.addEventListener('click', () => {
+      amount = '';
+      amountEl.textContent = yen(0);
+      setMode(b.dataset.type);
+      modal.classList.add('open');
+    }));
+  document.querySelectorAll('.segment').forEach(s =>
+    s.addEventListener('click', () => setMode(s.dataset.mode)));
+
+  document.querySelectorAll('.key').forEach(k =>
+    k.addEventListener('click', () => {
+      const v = k.dataset.key;
+      if (v === 'del') amount = amount.slice(0, -1);
+      else if (amount.length < 8) amount = (amount + v).replace(/^0+(?=\d)/, '');
+      amountEl.textContent = yen(amount);
+    }));
+
+  document.querySelectorAll('.pill-row').forEach(row =>
+    row.addEventListener('click', e => {
+      const btn = e.target.closest('.pill, .chip');
+      if (!btn) return;
+      row.querySelectorAll('.pill, .chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }));
+
+  document.querySelector('.js-close').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+  document.querySelectorAll('.toggle').forEach(t =>
+    t.addEventListener('click', () => t.classList.toggle('on')));
+</script>

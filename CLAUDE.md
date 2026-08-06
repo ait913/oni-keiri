@@ -8,7 +8,8 @@
 
 ## 主要ドキュメント
 
-- 設計書: `.designs/<YYYYMMDD>-<feature-slug>.md` (Architect が作成)
+- **設計 doc (正典)**: `.designs/20260806-v1-foundation.md` — Touri 承認済 (2026-08-06)。DB/API/挙動仕様/デザインシステム/Phase 分割すべてここ
+- **UI モック (正典)**: `.designs/20260806-mock-v0.6.html` — 白地+黒ヒーロー+ティール、3 タブ + ホーム機能ハブ
 - プロジェクト固有ナレッジ: `.knowledge/<topic>.md`
 
 ## 技術スタック
