@@ -23,15 +23,43 @@
 ## 規約・やらないこと
 
 - **エンジン構成 (この PJ の裁定、2026-08-06 Touri)**: トークン節約のため **Developer 実装・レビューループ・モック生成は `codex exec` 主体**。Researcher/Architect と統合判断は Claude。Codex 利用時は `knowledge/tool-quirk/codex-behavior.md` 必読、成果は必ず git/ファイル実体で検証。Codex の否定的主張 (「既存破損」「テスト不能」) は独立検証してから受理
-- UI はミニマル・アイコンボタンベース。基本機能へ最長 2 タップ。ベンチマークは PayPay
-- デザインシステムを設計 doc で先に確定し、UI の手戻りを作らない
+- UI の正典は `.designs/20260806-mock-v0.6.html` (白地+黒ヒーロー+ティール、赤はブランドと負値警告のみ)。3 タブ (ホーム/記録/設定)、機能はホームのハブからアクセス、記録系は 1 タップでモーダル
+- プロダクト軸: 「キャッシュフロー管理 → 日常出費の意識 → 金銭的余裕」。機能の優先度はこの軸で判断
 - 税金計算 v1 は目安ざっくり (概算率)。ただし DB は将来の精密計算 (控除・青色申告) に耐える設計にする
 
 ## 主要ワークフロー
 
-(環境構築が進み次第、ライブで追記: デプロイ手順 / TestFlight upload / マイグレーション)
+### サーバのテストを回す
+
+```
+cd apps/api
+docker compose -f docker-compose.test.yml up -d --wait   # test Postgres (port 54329)
+pnpm exec tsc --noEmit
+pnpm exec vitest run    # DB 依存テスト込み。fileParallelism=false 前提 (共有DB+TRUNCATE)
+```
+
+### デプロイする
+
+push しても自動デプロイはされない。Coolify API で明示的に:
+```
+curl -sS -H "Authorization: Bearer $COOLIFY_API_TOKEN" "$COOLIFY_API_BASE/deploy?uuid=sshwwljmwdw4wtmrc2pziyl5&force=false"
+# 確認: curl https://onikeiri.appily.run/healthz → {"ok":true}
+```
+migration はコンテナ起動時に自走 (index.ts が drizzle migrate を実行)。
+
+### iOS をビルドする
+
+```
+cd apps/ios
+xcodegen generate
+xcodebuild -project OniKeiri.xcodeproj -scheme OniKeiri -destination 'platform=iOS Simulator,name=iPhone 16' test
+```
+Info.plist は project.yml から再生成されるので手編集禁止。
 
 ## デプロイ / 外部リソース
 
-- URL: (未作成 — appily.run サブドメイン予定)
-- Coolify app uuid: (未作成)
+- URL: https://onikeiri.appily.run
+- Coolify app uuid: `sshwwljmwdw4wtmrc2pziyl5` (**現在 branch=feature/v1-foundation を向いている。main マージ後に git_branch を PATCH で main に戻すこと**)
+- Coolify Postgres uuid: `yfk5ppgsc0f0hsh0zj3kz2g1` (onikeiri-pg, postgres:17-alpine)
+- env: `APPLE_TEAM_ID / APPLE_KEY_ID / APPLE_PRIVATE_KEY` は **PLACEHOLDER のまま** — Touri の Apple ポータル作業 (App ID + Services ID `net.appily.onikeiri.web` + SIWA Key) 完了後に差し替え
+- 関連 SKILL: appily
