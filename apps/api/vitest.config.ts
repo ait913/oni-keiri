@@ -12,6 +12,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    // 共有 DB を各ファイルが TRUNCATE するためファイル並列は不可
+    fileParallelism: false,
     projects: [
       {
         test: {
@@ -24,6 +26,8 @@ export default defineConfig({
           name: "api",
           include: ["tests/api/**/*.test.ts"],
           globalSetup: ["tests/setup/global.ts"],
+          // 共有 DB を各ファイルが TRUNCATE するためファイル並列は不可
+          fileParallelism: false,
         },
       },
     ],

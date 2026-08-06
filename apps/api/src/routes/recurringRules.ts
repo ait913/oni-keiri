@@ -1,11 +1,11 @@
 import { Hono } from "hono";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../db/index.js";
-import { recurringRule } from "../db/schema.js";
+import { entry, recurringRule } from "../db/schema.js";
 import { AppError } from "../lib/appError.js";
 import { ensureMaterializedForUser, rematerializeRule } from "../lib/materialize.js";
-import { currentMonthJst } from "../lib/tz.js";
+import { currentMonthJst, todayJst } from "../lib/tz.js";
 import type { AppVariables } from "../types.js";
 import {
   assertFreelance,
@@ -85,7 +85,23 @@ recurringRulesRoutes.patch("/:id", async (c) => {
 recurringRulesRoutes.delete("/:id", async (c) => {
   const userId = c.get("user").id;
   const current = await requireOwnedRule(c.req.param("id"), userId);
-  await rematerializeRule(getDb(), { ...current, active: false });
-  await getDb().delete(recurringRule).where(and(eq(recurringRule.id, current.id), eq(recurringRule.userId, userId)));
+  const today = todayJst();
+  await getDb().transaction(async (tx) => {
+    await tx
+      .delete(entry)
+      .where(and(
+        eq(entry.sourceRuleId, current.id),
+        gt(entry.date, today),
+        eq(entry.isManuallyEdited, false),
+        isNull(entry.deletedAt),
+      ));
+    await tx
+      .update(entry)
+      .set({ sourceRuleId: null, updatedAt: new Date() })
+      .where(eq(entry.sourceRuleId, current.id));
+    await tx
+      .delete(recurringRule)
+      .where(and(eq(recurringRule.id, current.id), eq(recurringRule.userId, userId)));
+  });
   return c.body(null, 204);
 });

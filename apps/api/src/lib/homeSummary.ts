@@ -1,12 +1,5 @@
-import { daysInMonth, yearMonthOf } from "./money.js";
-
-export type SummaryEntry = {
-  kind: "expense" | "card_expense" | "income";
-  amount: number;
-  date: string;
-  category?: string | null;
-  sourceRuleId?: string | null;
-};
+import { daysInMonth } from "./money.js";
+import type { CardPaymentRow, EntryRow } from "./calendar.js";
 
 export type CardPayment = { paymentDate: string; amount: number };
 
@@ -38,7 +31,9 @@ export function buildDailySeries(input: {
   return { series, minPoint: minPoint ?? { date: `${input.month}-01`, value: 0 } };
 }
 
-export function buildBreakdown(entries: SummaryEntry[]): { category: string; amount: number }[] {
+const CATEGORY_ORDER = ["food", "daily", "transport", "entertainment", "housing", "business", "health", "other"] as const;
+
+export function buildBreakdown(entries: EntryRow[]): { category: string; amount: number }[] {
   const totals = new Map<string, number>();
   for (const entry of entries) {
     if (entry.kind === "income") continue;
@@ -48,10 +43,10 @@ export function buildBreakdown(entries: SummaryEntry[]): { category: string; amo
   return [...totals.entries()]
     .filter(([, amount]) => amount > 0)
     .map(([category, amount]) => ({ category, amount }))
-    .sort((a, b) => b.amount - a.amount);
+    .sort((a, b) => b.amount - a.amount || CATEGORY_ORDER.indexOf(a.category as (typeof CATEGORY_ORDER)[number]) - CATEGORY_ORDER.indexOf(b.category as (typeof CATEGORY_ORDER)[number]));
 }
 
-export function buildQuality(entries: SummaryEntry[]): { fixed: number; variable: number; savingTip: number } {
+export function buildQuality(entries: EntryRow[]): { fixed: number; variable: number; savingTip: number } {
   let fixed = 0;
   let variable = 0;
   for (const entry of entries) {
@@ -63,31 +58,19 @@ export function buildQuality(entries: SummaryEntry[]): { fixed: number; variable
 }
 
 export function buildHomeSummary(input: {
-  today: string;
-  month: string;
-  entries: SummaryEntry[];
-  cardPayments: CardPayment[];
+  entries: EntryRow[];
+  cardPayments: CardPaymentRow[];
   savingsGoal: number | null;
-  upcomingPayments: { amount: number; cardId?: string | null }[];
-  employmentType: "employee" | "freelance" | "part_time" | "contract";
 }): {
-  today: string;
-  month: string;
-  spendable: number;
-  remaining: number;
   income: number;
-  spending: number;
   cashExpense: number;
   cardPaymentDue: number;
   cardUsage: number;
-  savingsGoal: number | null;
-  dailySeries: { date: string; value: number; projected: boolean }[];
-  minPoint: { date: string; value: number };
-  upcomingPayments: { amount: number; cardId?: string | null }[];
-  upcomingTotal: number;
-  employmentType: "employee" | "freelance" | "part_time" | "contract";
+  spending: number;
+  remaining: number;
+  spendable: number;
 } {
-  const monthEntries = input.entries.filter((entry) => yearMonthOf(entry.date) === input.month);
+  const monthEntries = input.entries;
   const income = monthEntries.filter((entry) => entry.kind === "income").reduce((sum, entry) => sum + entry.amount, 0);
   const cashExpense = monthEntries.filter((entry) => entry.kind === "expense").reduce((sum, entry) => sum + entry.amount, 0);
   const cardUsage = monthEntries.filter((entry) => entry.kind === "card_expense").reduce((sum, entry) => sum + entry.amount, 0);
@@ -95,28 +78,14 @@ export function buildHomeSummary(input: {
   const spending = cashExpense + cardPaymentDue;
   const remaining = income - spending;
   const spendable = remaining - (input.savingsGoal ?? 0);
-  const { series: dailySeries, minPoint } = buildDailySeries({
-    month: input.month,
-    today: input.today,
-    entries: monthEntries.filter((entry): entry is SummaryEntry & { kind: "expense" | "income" } => entry.kind !== "card_expense"),
-    cardPayments: input.cardPayments,
-  });
 
   return {
-    today: input.today,
-    month: input.month,
-    spendable,
-    remaining,
     income,
-    spending,
     cashExpense,
     cardPaymentDue,
     cardUsage,
-    savingsGoal: input.savingsGoal,
-    dailySeries,
-    minPoint,
-    upcomingPayments: input.upcomingPayments,
-    upcomingTotal: input.upcomingPayments.reduce((sum, event) => sum + (event.cardId ? 0 : event.amount), 0),
-    employmentType: input.employmentType,
+    spending,
+    remaining,
+    spendable,
   };
 }

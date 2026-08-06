@@ -5,7 +5,7 @@ import { card, entry } from "../db/schema.js";
 import { buildCalendarEvents } from "../lib/calendar.js";
 import { todayJst } from "../lib/tz.js";
 import type { AppVariables } from "../types.js";
-import { parseQuery } from "./helpers.js";
+import { cardPaymentRowsForMonth, parseQuery } from "./helpers.js";
 import { MonthString, type CalendarResponse } from "./schemas.js";
 
 export const calendarRoutes = new Hono<{ Variables: AppVariables }>();
@@ -18,14 +18,14 @@ calendarRoutes.get("/", async (c) => {
     db.select().from(entry).where(and(eq(entry.userId, userId), isNull(entry.deletedAt))),
     db.select().from(card).where(eq(card.userId, userId)),
   ]);
+  const monthEntries = entries.filter((row) => row.yearMonth === month);
+  const cardPayments = await cardPaymentRowsForMonth(cards, entries, month);
+  const cardNamesById = Object.fromEntries(cards.map((row) => [row.id, row.name]));
   const result = buildCalendarEvents({
     month,
-    entries,
-    cards,
-    cardExpenses: entries
-      .filter((row) => row.kind === "card_expense" && row.cardId)
-      .map((row) => ({ cardId: row.cardId as string, date: row.date, amount: row.amount })),
+    entries: monthEntries,
+    cardPayments,
+    cardNamesById,
   });
   return c.json({ month, today: todayJst(), ...result } satisfies CalendarResponse);
 });
-

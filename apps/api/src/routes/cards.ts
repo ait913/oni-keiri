@@ -94,8 +94,9 @@ cardsRoutes.get("/:id/detail", async (c) => {
   const startMonth = currentMonth > firstMonth ? currentMonth : firstMonth;
   const targetMonths = Array.from({ length: months }, (_, i) => addMonths(startMonth, i));
   const allPayments = cardPaymentSchedule(current, expenses, targetMonths[targetMonths.length - 1]);
+  const today = todayJst();
   const recentExpenses = entries
-    .filter((item) => item.cardId === current.id)
+    .filter((item) => item.cardId === current.id && item.kind === "card_expense" && item.date <= today)
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 10)
     .map(entryDto);
@@ -115,7 +116,7 @@ cardsRoutes.get("/:id/detail", async (c) => {
         amount: 0,
         fromExclusive: range.fromExclusive,
         toInclusive: range.toInclusive,
-        closed: todayJst() > range.toInclusive,
+        closed: today > range.toInclusive,
         balanceAfter: current.carryoverBalance,
       };
     }),

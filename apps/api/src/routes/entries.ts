@@ -137,7 +137,7 @@ entriesRoutes.delete("/:id", async (c) => {
   const userId = c.get("user").id;
   const current = await requireOwnedEntry(c.req.param("id"), userId);
   if (current.sourceRuleId) {
-    await getDb().update(entry).set({ deletedAt: new Date(), updatedAt: new Date() }).where(eq(entry.id, current.id));
+    await getDb().update(entry).set({ deletedAt: new Date(), isManuallyEdited: true, updatedAt: new Date() }).where(eq(entry.id, current.id));
   } else {
     await getDb().delete(entry).where(eq(entry.id, current.id));
   }

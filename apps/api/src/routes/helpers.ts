@@ -6,6 +6,7 @@ import { getDb, type Db } from "../db/index.js";
 import { AppError } from "../lib/appError.js";
 import { addMonths, currentMonthJst, todayJst } from "../lib/tz.js";
 import { cardPaymentSchedule, cardUtilization } from "../lib/cardSchedule.js";
+import type { CardPaymentRow } from "../lib/calendar.js";
 import type { AppVariables } from "../types.js";
 import type { CardDto, EntryDto, RecurringRuleDto, SettingsDto } from "./schemas.js";
 
@@ -131,15 +132,32 @@ export async function cardDto(row: typeof card.$inferSelect, entries: (typeof en
   };
 }
 
-export async function allCardPaymentsForMonth(db: Db, userId: string, month: string): Promise<{ paymentDate: string; amount: number }[]> {
-  const cards = await db.select().from(card).where(eq(card.userId, userId));
-  const entries = await db.select().from(entry).where(and(eq(entry.userId, userId), isNull(entry.deletedAt)));
+export async function cardPaymentRowsForMonth(
+  cards: (typeof card.$inferSelect)[],
+  entries: (typeof entry.$inferSelect)[],
+  month: string,
+): Promise<CardPaymentRow[]> {
   return cards.flatMap((row) => {
     const expenses = entries
       .filter((item) => item.cardId === row.id && item.kind === "card_expense")
       .map((item) => ({ date: item.date, amount: item.amount }));
     return cardPaymentSchedule(row, expenses, month)
       .filter((payment) => payment.month === month)
-      .map((payment) => ({ paymentDate: payment.paymentDate, amount: payment.amount }));
+      .map((payment) => ({
+        cardId: row.id,
+        cardName: row.name,
+        paymentDate: payment.paymentDate,
+        amount: payment.amount,
+        fromExclusive: payment.fromExclusive,
+        toInclusive: payment.toInclusive,
+        closed: payment.closed,
+      }));
   });
+}
+
+export async function allCardPaymentsForMonth(db: Db, userId: string, month: string): Promise<{ paymentDate: string; amount: number }[]> {
+  const cards = await db.select().from(card).where(eq(card.userId, userId));
+  const entries = await db.select().from(entry).where(and(eq(entry.userId, userId), isNull(entry.deletedAt)));
+  return (await cardPaymentRowsForMonth(cards, entries, month))
+    .map((payment) => ({ paymentDate: payment.paymentDate, amount: payment.amount }));
 }
