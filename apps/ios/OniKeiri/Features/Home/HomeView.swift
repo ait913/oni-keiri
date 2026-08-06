@@ -224,24 +224,19 @@ private struct FeatureGrid: View {
     let employmentType: EmploymentType
 
     var body: some View {
-        let features = [
-            ("サブスク・定額", "arrow.triangle.2.circlepath", "feature-subs"),
-            ("カード", "creditcard", "feature-cards"),
-            ("給与", "banknote", "feature-salary"),
-            ("税金目安", "chart.bar", "feature-tax")
-        ].filter { employmentType == .freelance || $0.2 != "feature-tax" }
+        let features = HomeFeature.allCases.filter { employmentType == .freelance || $0 != .tax }
 
         HStack(spacing: DS.Spacing.gridGap) {
-            ForEach(features, id: \.2) { feature in
+            ForEach(features) { feature in
                 NavigationLink {
-                    FeaturePlaceholderView(title: feature.0)
+                    feature.destination
                 } label: {
                     VStack(spacing: 6) {
-                        Image(systemName: feature.1)
+                        Image(systemName: feature.systemImage)
                             .font(.system(size: 22, weight: .medium))
                             .frame(width: 52, height: 52)
                             .background(DS.Palette.bgSoft, in: RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
-                        Text(feature.0)
+                        Text(feature.title)
                             .font(DS.Typo.labelS)
                             .foregroundStyle(DS.Palette.textSub)
                             .lineLimit(2)
@@ -251,8 +246,58 @@ private struct FeatureGrid: View {
                     .frame(maxWidth: .infinity)
                 }
                 .foregroundStyle(DS.Palette.text)
-                .accessibilityIdentifier(feature.2)
+                .accessibilityIdentifier(feature.accessibilityIdentifier)
             }
+        }
+    }
+}
+
+private enum HomeFeature: CaseIterable, Identifiable {
+    case subs
+    case cards
+    case salary
+    case tax
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .subs: "サブスク・定額"
+        case .cards: "カード"
+        case .salary: "給与"
+        case .tax: "税金目安"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .subs: "arrow.triangle.2.circlepath"
+        case .cards: "creditcard"
+        case .salary: "banknote"
+        case .tax: "chart.bar"
+        }
+    }
+
+    var accessibilityIdentifier: String {
+        switch self {
+        case .subs: "feature-subs"
+        case .cards: "feature-cards"
+        case .salary: "feature-salary"
+        case .tax: "feature-tax"
+        }
+    }
+
+    @ViewBuilder
+    var destination: some View {
+        switch self {
+        case .subs:
+            SubsListView()
+        case .cards:
+            CardsListView()
+        case .salary:
+            SalaryListView()
+        case .tax:
+            TaxView()
         }
     }
 }
@@ -268,7 +313,7 @@ private struct UpcomingPaymentsCard: View {
                     .foregroundStyle(DS.Palette.textSub)
                 Spacer()
                 NavigationLink("カレンダーで見る ›") {
-                    FeaturePlaceholderView(title: "カレンダー")
+                    CalendarView()
                 }
                 .font(DS.Typo.caption.weight(.semibold))
                 .foregroundStyle(DS.Palette.teal)

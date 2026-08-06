@@ -12,6 +12,7 @@ enum DS {
         static let teal = Color(hex: 0x2E9E8F)
         static let tealSoft = Color(hex: 0xE7F3F0)
         static let red = Color(hex: 0xE60033)
+        static let blue = Color(hex: 0x3478F6)
         static let heroTeal = Color(hex: 0x6FD3C5)
     }
 

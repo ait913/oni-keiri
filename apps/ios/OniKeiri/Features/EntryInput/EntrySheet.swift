@@ -76,6 +76,7 @@ enum EntrySubmission {
 
 struct EntrySheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppEnvironment.self) private var environment
 
     private let cards: [CardDto]
     private let employmentType: EmploymentType
@@ -95,6 +96,7 @@ struct EntrySheet: View {
     @State private var isSubmitting = false
     @State private var errorMessage: String?
     @State private var showDeleteConfirmation = false
+    @State private var showCardForm = false
 
     init(
         initialSegment: EntrySegment,
@@ -146,7 +148,9 @@ struct EntrySheet: View {
                     }
 
                     if segment == .cardExpense {
-                        CardChips(cards: cards, selection: $cardId)
+                        CardChips(cards: cards, selection: $cardId) {
+                            showCardForm = true
+                        }
                     }
 
                     if segment == .income {
@@ -220,6 +224,20 @@ struct EntrySheet: View {
         .onChange(of: segment) { _, newValue in
             if newValue == .cardExpense, cardId == nil {
                 cardId = cards.first?.id
+            }
+        }
+        .sheet(isPresented: $showCardForm) {
+            CardFormSheet { body in
+                do {
+                    _ = try await environment.api.createCard(body)
+                    environment.ticker.bump()
+                    return true
+                } catch APIError.unauthorized {
+                    environment.auth.handleUnauthorized()
+                    return false
+                } catch {
+                    return false
+                }
             }
         }
     }
@@ -358,6 +376,7 @@ private struct CategoryChips: View {
 private struct CardChips: View {
     let cards: [CardDto]
     @Binding var selection: String?
+    let onAddCard: () -> Void
 
     var body: some View {
         if cards.isEmpty {
@@ -365,8 +384,8 @@ private struct CardChips: View {
                 Text("カードを登録してください")
                     .font(DS.Typo.caption)
                     .foregroundStyle(DS.Palette.textSub)
-                NavigationLink("カードを追加") {
-                    FeaturePlaceholderView(title: "カード")
+                Button("カードを追加") {
+                    onAddCard()
                 }
                 .font(DS.Typo.caption.weight(.semibold))
                 .foregroundStyle(DS.Palette.teal)
@@ -466,7 +485,7 @@ struct BusinessExpenseInput: Identifiable, Equatable {
     }
 }
 
-private struct NumericKeypad: View {
+struct NumericKeypad: View {
     @Binding var amount: AmountInput
     private let keys: [KeypadKey] = [.digit(1), .digit(2), .digit(3), .digit(4), .digit(5), .digit(6), .digit(7), .digit(8), .digit(9), .doubleZero, .digit(0), .backspace]
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)

@@ -164,4 +164,99 @@ final class DTOTests: XCTestCase {
         XCTAssertEqual(response.paymentCount, 2)
         XCTAssertEqual(response.paymentTotal, 108000)
     }
+
+    func testCardDetailResponseDecodeSample() throws {
+        let json = """
+        {
+          "card": {
+            "id": "card-1",
+            "name": "楽天カード",
+            "closingDay": 15,
+            "paymentDay": 27,
+            "revolvingAmount": null,
+            "creditLimit": 300000,
+            "carryoverBalance": 12000,
+            "archived": false,
+            "utilization": 86000,
+            "monthUsage": 24000,
+            "nextPayment": {
+              "month": "2026-09",
+              "paymentDate": "2026-09-27",
+              "amount": 54000,
+              "closed": false
+            }
+          },
+          "payments": [
+            {
+              "month": "2026-09",
+              "paymentDate": "2026-09-27",
+              "amount": 54000,
+              "fromExclusive": "2026-07-15",
+              "toInclusive": "2026-08-15",
+              "closed": false,
+              "balanceAfter": 32000
+            }
+          ],
+          "recentExpenses": [
+            {
+              "id": "entry-card",
+              "kind": "card_expense",
+              "amount": 3800,
+              "date": "2026-08-07",
+              "yearMonth": "2026-08",
+              "category": "business",
+              "cardId": "card-1",
+              "incomeSource": null,
+              "note": "ソフトウェア",
+              "sourceRuleId": null,
+              "isManuallyEdited": false
+            }
+          ],
+          "linkedRules": [
+            {
+              "id": "rule-1",
+              "direction": "expense",
+              "name": "Adobe",
+              "amount": 3280,
+              "dayOfMonth": 10,
+              "cardId": "card-1",
+              "category": "business",
+              "startMonth": "2026-08",
+              "active": true
+            }
+          ]
+        }
+        """.data(using: .utf8)!
+
+        let response = try JSONDecoder().decode(CardDetailResponse.self, from: json)
+
+        XCTAssertEqual(response.card.name, "楽天カード")
+        XCTAssertEqual(response.card.nextPayment?.amount, 54000)
+        XCTAssertEqual(response.payments.first?.balanceAfter, 32000)
+        XCTAssertEqual(response.recentExpenses.first?.kind, .cardExpense)
+        XCTAssertEqual(response.linkedRules.first?.category, .business)
+    }
+
+    func testTaxEstimateResponseDecodeSample() throws {
+        let json = """
+        {
+          "year": 2026,
+          "businessIncomeYtd": 1800000,
+          "businessExpenseYtd": 240000,
+          "profitYtd": 1560000,
+          "rate": 0.2,
+          "estimatedTax": 312000,
+          "monthlySetAside": 39000,
+          "annualProjection": 468000
+        }
+        """.data(using: .utf8)!
+
+        let response = try JSONDecoder().decode(TaxEstimateResponse.self, from: json)
+
+        XCTAssertEqual(response.year, 2026)
+        XCTAssertEqual(response.profitYtd, 1560000)
+        XCTAssertEqual(response.rate, 0.2)
+        XCTAssertEqual(response.monthlySetAside, 39000)
+        XCTAssertEqual(response.annualProjection, 468000)
+    }
 }

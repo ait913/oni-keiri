@@ -6,6 +6,8 @@ struct SettingsView: View {
     @State private var viewModel = SettingsViewModel()
     @State private var showWorkStyle = false
     @State private var showSavingsGoal = false
+    @State private var showDeleteAccountConfirmation = false
+    @State private var accountDeleteError: String?
 
     var body: some View {
         ScrollView {
@@ -63,6 +65,20 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
                     .overlay(Capsule().stroke(DS.Palette.line))
+
+                    Button("アカウント削除") {
+                        showDeleteAccountConfirmation = true
+                    }
+                    .font(DS.Typo.body.weight(.semibold))
+                    .foregroundStyle(DS.Palette.red)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+
+                    if let accountDeleteError {
+                        Text(accountDeleteError)
+                            .font(DS.Typo.caption)
+                            .foregroundStyle(DS.Palette.red)
+                    }
                 }
             }
             .padding(DS.Spacing.screenMargin)
@@ -95,6 +111,24 @@ struct SettingsView: View {
                     )
                 }
             }
+        }
+        .confirmationDialog("アカウントを削除しますか", isPresented: $showDeleteAccountConfirmation, titleVisibility: .visible) {
+            Button("アカウントを削除する", role: .destructive) {
+                Task {
+                    accountDeleteError = nil
+                    do {
+                        try await environment.api.deleteAccount()
+                        await environment.auth.signOut()
+                    } catch APIError.unauthorized {
+                        environment.auth.handleUnauthorized()
+                    } catch {
+                        accountDeleteError = "アカウントを削除できませんでした。"
+                    }
+                }
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("すべての記録と設定が削除されます。この操作は取り消せません。")
         }
     }
 }
