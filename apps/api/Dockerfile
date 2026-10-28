@@ -19,4 +19,5 @@ COPY --from=deps /app/apps/api/node_modules ./node_modules
 COPY --from=build /app/apps/api/dist ./dist
 COPY --from=build /app/apps/api/drizzle ./drizzle
 COPY --from=build /app/apps/api/package.json ./package.json
+USER node
 CMD ["node", "dist/index.js"]
